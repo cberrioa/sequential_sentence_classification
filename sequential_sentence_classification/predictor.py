@@ -14,14 +14,16 @@ class SeqClassificationPredictor(Predictor):
     def predict_json(self, json_dict: JsonDict) -> JsonDict:
         pred_labels = []
         sentences = json_dict['sentences']
-        paper_id = json_dict['abstract_id']
+        paper_id = json_dict['doc_id']
+        self._dataset_reader.predict = True
         for sentences_loop, _, _, _ in  \
             self._dataset_reader.enforce_max_sent_per_example(sentences):
-            instance = self._dataset_reader.text_to_instance(abstract_id=0, sentences=sentences_loop)
+            instance = self._dataset_reader.text_to_instance(sentences=sentences_loop)
+            self._dataset_reader.apply_token_indexers(instance)
             output = self._model.forward_on_instance(instance)
             idx = output['action_probs'].argmax(axis=1).tolist()
             labels = [self._model.vocab.get_token_from_index(i, namespace='labels') for i in idx]
             pred_labels.extend(labels)
         assert len(pred_labels) == len(sentences)
         preds = list(zip(sentences, pred_labels))
-        return paper_id, preds
+        return {"doc_id": paper_id, "preds": preds}

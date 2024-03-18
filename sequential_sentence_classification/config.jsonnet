@@ -72,10 +72,10 @@ local boolToInt(s) =
   "trainer": {
     "num_epochs": std.parseInt(std.extVar("NUM_EPOCHS")),
     "grad_clipping": 1.0,
-    "patience": 5,
-    "validation_metric": if stringToBool(std.extVar("SCI_SUM")) then "-loss" else '+acc',
+    "patience": 3,
+    "validation_metric": if stringToBool(std.extVar("SCI_SUM")) then "-loss" else '+avgF',
     "cuda_device": std.parseInt(std.extVar("cuda_device")),
-    "num_gradient_accumulation_steps": 32,
+    "num_gradient_accumulation_steps": 2,
     "optimizer": {
       "type": "huggingface_adamw",
       "lr": std.parseJson(std.extVar("LR")),
